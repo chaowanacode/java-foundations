@@ -71,13 +71,37 @@ public class ControlFlow {
 //        }
 //        scanner.close();
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("How many second to countdown from?: ");
-        int start = scanner.nextInt();
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.println("How many second to countdown from?: ");
+//        int start = scanner.nextInt();
+//
+//        for (int i = start; i > 0; i--){
+//            System.out.println(i);
+//        }
+//        System.out.println("Happy New Year!!!");
 
-        for (int i = start; i > 0; i--){
-            System.out.println(i);
-        }
-        System.out.println("Happy New Year!!!");
+        // while loop
+//        Scanner scanner = new Scanner(System.in);
+//        String name = "";
+
+//        while (name.isEmpty()) {
+//            System.out.print("Enter your name: ");
+//            name = scanner.nextLine();
+//        }
+//        System.out.println("Hello " + name);
+//        scanner.close();
+//
+//        Scanner scanner = new Scanner(System.in);
+//        String name = "";
+
+        Scanner scanner = new Scanner(System.in);
+        int number = 0;
+
+        do {
+            System.out.print("Enter a number between 1-10: ");
+            number = scanner.nextInt();
+        } while (number < 1 || number > 10);
+        System.out.println("You picked " + number);
+        scanner.close();
     }
 }
