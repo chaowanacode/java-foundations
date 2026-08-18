@@ -2,6 +2,13 @@
 package w03.interfaces;
 public class InterfacesDemo {
     public static void main(String[] args) {
-        // TODO
+        Rabbit rabbit = new Rabbit();
+        Hawk hawk = new Hawk();
+        Fish fish = new Fish();
+
+        hawk.hunt();
+        rabbit.flee();
+        fish.flee();
+        fish.hunt();
     }
 }
