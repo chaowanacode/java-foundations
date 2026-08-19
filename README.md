@@ -8,6 +8,7 @@ JDK 25 / IntelliJ IDEA CE
 
 ## Log
 
+- **W3 (19 Aug):** Added src/w03/arraylist/ (ArrayListDemo.java, SearchArray.java, UserInputArray.java, TwoDimensionArray.java, Varargs.java) and src/w03/hashmap/ (HashMapDemo.java), added array, varargs, and hashmap sections to notes/w03.md.
 - **W3 (18 Aug):** Added src/w03/interfaces/ (InterfacesDemo.java, Predator.java, Prey.java, Fish.java, Hawk.java, Rabbit.java) and src/w03/generics/ (GenericsDemo.java, Box.java, Product.java), added interfaces and generics sections to notes/w03.md.
 - **W3 (17 Aug):** Added src/w03/methods/ (MethodsDemo.java, OverloadedMethodsDemo.java, VariableScopeDemo.java), added notes/w03.md.
 - **W2 (14 Aug):** Classes and objects, constructors, constructor chaining (this()), encapsulation, private fields, getters and setters, validation strategies.
