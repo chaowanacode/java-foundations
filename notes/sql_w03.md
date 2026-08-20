@@ -67,3 +67,28 @@ ON a.referral_id = b.customer_id;
 ```
 
 ## Index
+
+An index is a type of data structure (B-tree) used to find values within a specific column more quickly. MySQL normally searches sequentially through a column; the longer the column, the more expensive that search becomes.
+
+- Applying an index speeds up searching/selecting, but slows down updating — a table that's frequently updated (e.g. transactions) is a poor index candidate, while a rarely-updated table (e.g. customers) benefits more.
+- Multi-column indexes follow a leftmost prefix rule: columns must be queried in the order they were indexed. A `(last_name, first_name)` index speeds up searches by `last_name` alone, or by `last_name` + `first_name` together, but not by `first_name` alone.
+- `SHOW INDEXES FROM <table>` lists current indexes. `DROP INDEX <name> ON <table>` (or `ALTER TABLE ... DROP INDEX`) removes one.
+
+### Example queries (see `sql/w03/indexes.sql`)
+
+```sql
+-- Single-column index
+CREATE INDEX last_name_idx
+ON customers (last_name);
+```
+
+```sql
+-- Multi-column index (leftmost prefix: last_name must come first)
+CREATE INDEX last_name_first_name_idx
+ON customers (last_name, first_name);
+```
+
+```sql
+-- Drop the now-redundant single-column index
+ALTER TABLE customers DROP INDEX last_name_idx;
+```
