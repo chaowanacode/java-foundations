@@ -5,7 +5,7 @@
 - [🔧 JOIN](#-join)
 - [🔧 Index](#-index)
 
-## JOIN
+## 🔧 JOIN
 
 A JOIN in MySQL is a clause used to combine rows from two or more tables based on a related column between them, such as a foreign key.
 
@@ -66,7 +66,7 @@ LEFT JOIN customers AS b
 ON a.referral_id = b.customer_id;
 ```
 
-## Index
+## 🔧 Index
 
 An index is a type of data structure (B-tree) used to find values within a specific column more quickly. MySQL normally searches sequentially through a column; the longer the column, the more expensive that search becomes.
 
