@@ -8,6 +8,7 @@
 - [🔐 Table Locks vs Row Locks](#-table-locks-vs-row-locks)
 - [💀 Deadlocks](#-deadlocks)
 - [🔍 SQL EXPLAIN](#-sql-explain)
+- [➕ N+1 Query Problem](#-n1-query-problem)
 
 ## 🔧 JOIN
 
@@ -141,3 +142,48 @@ Columns that matter: `type` (ALL = full table scan, bad), `possible_keys`, `key`
 - Adding a covering index (`product_name` + `isbn`) didn't change the plan — the optimizer chose by cost. Forcing it with `USE INDEX (...)` gave cost ~109 vs ~76 for the optimizer's pick, confirming the optimizer was right.
 
 Takeaway: a covering index isn't automatically better; compare costs with `FORMAT=JSON`.
+
+## ➕ N+1 Query Problem
+
+Happens when an app runs one query to fetch a list, then runs an additional query for each item in that list to get related data. Total query count grows linearly with the amount of data — 1 + N queries instead of 1.
+
+**Example**
+
+1. Query #1: fetch all posts.
+2. Loop through each post, run a separate query to fetch its author.
+3. Result: 1 + N queries, instead of a single query with a JOIN.
+
+**Why it's bad**
+
+- Database load increases directly with row count (e.g. 1,000 users → 1,001 queries instead of 1).
+- Easy to miss because ORMs hide the actual SQL being generated — lazy loading fires a new query per record without you seeing it.
+
+**How to fix**
+
+1. **JOIN** — combine tables into a single query.
+2. **IN clause / batch fetch** — fetch related rows in one batch instead of one at a time.
+3. **Eager loading (ORM side)** — tell the ORM to load related data upfront instead of lazily per record.
+
+```sql
+-- N+1: one of these fires per post
+SELECT * FROM users WHERE user_id = 1;
+SELECT * FROM users WHERE user_id = 2;
+-- ...
+
+-- Fix 1: JOIN
+SELECT posts.*, users.first_name, users.last_name
+FROM posts
+INNER JOIN users
+ON posts.user_id = users.user_id;
+
+-- Fix 2: batch fetch
+SELECT * FROM users WHERE user_id IN (1, 2, 3, 4, 5);
+```
+
+**How to spot it in code**
+
+Turn on query logging and look for many `SELECT` statements that are nearly identical, differing only by the `WHERE id` value — that repeating pattern is the signal.
+
+**Relevance**
+
+Shows up constantly once working with JPA/Hibernate in Spring Boot, especially with `@OneToMany` relationships. Useful to recognize at the SQL level now, before hitting it in an ORM context later in Track B.
