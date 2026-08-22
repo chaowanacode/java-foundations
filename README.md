@@ -8,6 +8,7 @@ JDK 25 / IntelliJ IDEA CE
 
 ## Log
 
+- **W3 (22 Aug):** Added sql/w03/ (isolation_levels.sql, locks.sql, deadlocks.sql, explain.sql), added transaction isolation, table vs row locks, deadlock, EXPLAIN, and N+1 query problem sections to notes/sql_w03.md.
 - **W3 (20 Aug):** Added sql/w03/ (joins.sql, indexes.sql), added notes/sql_w03.md with JOIN (inner, left, right, self) and index sections.
 - **W3 (19 Aug):** Added src/w03/arraylist/ (ArrayListDemo.java, SearchArray.java, UserInputArray.java, TwoDimensionArray.java, Varargs.java) and src/w03/hashmap/ (HashMapDemo.java), added array, varargs, and hashmap sections to notes/w03.md.
 - **W3 (18 Aug):** Added src/w03/interfaces/ (InterfacesDemo.java, Predator.java, Prey.java, Fish.java, Hawk.java, Rabbit.java) and src/w03/generics/ (GenericsDemo.java, Box.java, Product.java), added interfaces and generics sections to notes/w03.md.
