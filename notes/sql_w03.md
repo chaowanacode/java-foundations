@@ -1,9 +1,13 @@
-# W3 — SQL (JOIN, Index)
+# W3 — SQL (JOIN, Index, Transactions, EXPLAIN)
 
 ## Table of Contents
 
 - [🔧 JOIN](#-join)
 - [🔧 Index](#-index)
+- [🔒 Transaction Isolation Levels](#-transaction-isolation-levels)
+- [🔐 Table Locks vs Row Locks](#-table-locks-vs-row-locks)
+- [💀 Deadlocks](#-deadlocks)
+- [🔍 SQL EXPLAIN](#-sql-explain)
 
 ## 🔧 JOIN
 
@@ -92,3 +96,48 @@ ON customers (last_name, first_name);
 -- Drop the now-redundant single-column index
 ALTER TABLE customers DROP INDEX last_name_idx;
 ```
+
+## 🔒 Transaction Isolation Levels
+
+Controls what one session sees while another is modifying the same data. Check with `SHOW VARIABLES LIKE '%isolation%'`, change with `SET SESSION TRANSACTION ISOLATION LEVEL ...`
+
+- **READ UNCOMMITTED** — dirty reads; you see another session's changes before it commits.
+- **READ COMMITTED** — you only see committed data. Recommended for OLTP/e-commerce.
+- **REPEATABLE READ** — MySQL's actual default. Inside a transaction, repeated reads return the same value even if another session commits in between.
+- **SERIALIZABLE** — strictest. Even a plain `SELECT` locks the row, so updates from other sessions wait (and can time out).
+
+Demos use `autocommit=0` + `START TRANSACTION` so commits are explicit — see `sql/w03/isolation_levels.sql` (run it with two sessions side by side).
+
+## 🔐 Table Locks vs Row Locks
+
+See `sql/w03/locks.sql` (three sessions: seller, buyer 1, buyer 2).
+
+Why locks exist: the **lost-update problem**. Seller reads qty 40 and writes 100 (+60); buyer also read 40 and writes 38 (−2). The seller's update is lost, data is corrupted.
+
+- **Table lock** — seller locks the whole `products` table for write. Buyer 1 (same book) hangs, Buyer 2 (different book) hangs, and even a browse/`SELECT` hangs. Concurrency collapses.
+- **Row lock** (InnoDB default) — only the affected row is locked. Other rows update fine, and `SELECT` on any row still works. Blocked sessions eventually time out.
+- Inspect with a query on `performance_schema.data_locks`: you'll see an IX (intention exclusive) entry at table level plus a record lock on the specific key value (e.g. `product_id = 1`).
+
+## 💀 Deadlocks
+
+See `sql/w03/deadlocks.sql` (two sessions, run in the numbered order).
+
+Two transactions each hold a row lock the other needs → circular wait.
+
+- Session A updates row 1, Session B updates row 2 (fine, independent locks). Then B tries row 1 and A tries row 2 → deadlock.
+- InnoDB detects it and kills one session: error 1213, "Deadlock found when trying to get lock; try restarting transaction." The victim's transaction is rolled back; the other one proceeds.
+- Prevention: keep transactions short and always touch rows in a consistent order.
+
+## 🔍 SQL EXPLAIN
+
+See `sql/w03/explain.sql`.
+
+`EXPLAIN <query>\G` shows the execution plan; `EXPLAIN FORMAT=JSON` adds query cost.
+
+Columns that matter: `type` (ALL = full table scan, bad), `possible_keys`, `key` (the one actually chosen), `key_len`, `rows`, `filtered %`, `Extra`.
+
+- Before indexing `product_name`: full scan of the whole table, ~10% filtered.
+- After `CREATE INDEX ... ON products_1(product_name)`: index is used, rows scanned drops to ~589, no filtering needed.
+- Adding a covering index (`product_name` + `isbn`) didn't change the plan — the optimizer chose by cost. Forcing it with `USE INDEX (...)` gave cost ~109 vs ~76 for the optimizer's pick, confirming the optimizer was right.
+
+Takeaway: a covering index isn't automatically better; compare costs with `FORMAT=JSON`.
